@@ -1,180 +1,157 @@
-# 🧠 AI Email Generation & Evaluation System
+🧠 AI Email Generation & Evaluation System
+📌 Project Overview
 
-## 📌 Project Overview
-This project is an AI-powered Email Generation Assistant that uses Large Language Models (LLMs) with advanced prompt engineering and a custom evaluation framework.
+This project is an LLM-powered Email Generation system that generates professional emails from structured inputs and evaluates output quality using a custom evaluation framework.
 
-The system generates professional emails based on:
-- Intent
-- Key Facts
-- Tone
+It compares two prompting strategies:
 
-It also evaluates output quality using custom-built metrics and compares two different prompting strategies (Model A vs Model B).
+Model A (Baseline Prompt)
+Model B (Strict Constraint-Based Prompt)
 
----
+The system performs automated A/B testing using custom metrics and selects the best-performing model.
 
-## 🚀 Features
+🏗️ System Architecture
+Test Cases (10 Scenarios)
+        ↓
+Evaluation Pipeline (evaluate.py)
+        ↓
+Model A & Model B Execution
+        ↓
+Generated Emails
+        ↓
+Metrics Engine
+        ↓
+Score Aggregation
+        ↓
+CSV Output
+        ↓
+Final Model Comparison
 
-### ✉️ Email Generation
-- Converts structured input into professional emails
-- Supports multiple tones (formal, professional, polite, etc.)
-- Ensures all required facts are included
+🚀 Features
 
-### 🧠 Prompt Engineering
-- Role-based prompting (Model A)
-- Constraint-based prompting with self-checks (Model B)
-- Iterative improvement (A → B)
+✉️ Email Generation
+Converts structured input into professional emails
+Supports multiple tones (formal, polite, urgent, empathetic)
+Ensures all required facts are included
 
-### 📊 Evaluation System
-Custom metrics used:
-- **Fact Coverage**
-- **Structure Score**
-- **Grammar & Fluency Score**
-- **Tone Score (LLM-as-a-Judge)**
+🧠 Prompt Engineering
+Model A → Flexible baseline prompt
+Model B → Strict constraint-driven prompt with self-check logic
 
-### ⚖️ Model Comparison
-- Model A (baseline prompt)
-- Model B (strict optimized prompt)
-- Automated evaluation and comparison pipeline
-- Stability analysis using variance
+📊 Evaluation System
 
----
+Evaluates outputs using 4 metrics:
+Fact Coverage Score (0–1)
+Structure Score (0–1)
+Grammar & Fluency Score (0–1)
+Tone Score (0–10, LLM judge)
 
-## 📊 Custom Metric Definitions
+⚖️ Model Comparison
+Same dataset for both models
+Identical evaluation pipeline
+Final decision based on average score
 
-### 1. Fact Coverage Score
-**Definition:**  
-Measures whether all required input facts are included in the generated email.
+📊 Custom Metric Definitions
+1. Fact Coverage Score
 
-**Logic:**
-- Each fact is broken into keywords
-- Email is converted to lowercase
-- Checks if all keywords of each fact exist in the email
-- Final score:
+Ensures all input facts are included in the generated email.
+
+Formula:
 
 Fact Coverage = Matched Facts / Total Facts
 
-**Range:** 0 to 1  
-**Goal:** Ensure no critical information is missing
+Range: 0 to 1
 
----
+2. Structure Score
 
-### 2. Structure Score
-**Definition:**  
-Evaluates whether the email follows proper professional formatting.
+Checks proper email formatting.
 
-**Checks (each = 0.25):**
-- Subject line present
-- Greeting present (Dear/Hello)
-- Paragraph structure (line breaks)
-- Closing present (Regards/Thanks/Sincerely)
+Criteria (0.25 each):
 
-**Range:** 0 to 1  
-**Goal:** Ensure professional readability and format
+Subject line
+Greeting
+Paragraph structure
+Closing statement
 
----
+Range: 0 to 1
 
-### 3. Grammar & Fluency Score
-**Definition:**  
-Evaluates linguistic quality using rule-based heuristics.
+3. Grammar & Fluency Score
 
-**Logic:**
-- Starts from 1.0 score
-- Applies penalties:
-  - Repeated words → -0.1 each
-  - Missing punctuation → -0.2
-  - Long sentences (>30 words) → -0.1 each
-  - Very short email → -0.2
-- Final score clipped between 0 and 1
+Rule-based evaluation of language quality.
 
-**Range:** 0 to 1  
-**Goal:** Ensure readability and natural language quality
+Penalties:
 
----
+Repeated words (-0.1)
+Missing punctuation (-0.2)
+Long sentences (-0.1 each)
+Short email (-0.2)
 
-### 4. Tone Score (LLM-as-a-Judge)
-**Definition:**  
-Evaluates how well the email matches the requested tone.
+Final score normalized between 0 and 1.
 
-**Logic:**
-- Uses an LLM as evaluator
-- Inputs:
-  - Intended tone
-  - Intent
-  - Generated email
-- Outputs score from 0–10
+4. Tone Score (LLM-as-a-Judge)
 
-**Range:** 0 to 10  
-**Goal:** Ensure correct emotional and professional tone
+Evaluates tone alignment using an LLM.
 
----
+Input:
 
-## 📂 Project Structure
+Intent
+Tone
+Generated email
 
+Output:
+
+Score (0–10)
+📂 Project Structure
 email_generator/
 │
-├── generator.py # Model A (baseline)
-├── generator_v2.py # Model B (improved prompt)
-├── test_case.py # Benchmark dataset
-├── metrics.py # Custom evaluation metrics
-├── evaluate.py # Evaluation pipeline
-├── comparison_results.csv # Model comparison output
+├── generator.py          # Model A
+├── generator_v2.py       # Model B
+├── test_case.py          # 10 test scenarios
+├── metrics.py            # Evaluation metrics
+├── evaluate.py           # Main evaluation pipeline
+├── comparison_results.csv# Output results
+└── .env                  # API keys (not pushed)
 
-
----
-
-## ⚙️ How to Run
-
-### 1. Install dependencies
-```bash
-pip install langchain-groq python-dotenv
-
-2. Set API Key
-
-Create a .env file:
-
+⚙️ How to Run
+1. Install dependencies
+pip install langchain-groq python-dotenv numpy
+2. Create .env file
 GROQ_API_KEY=your_api_key_here
-
-3. Run Email Generator
-python generator_v2.py
-4. Run Evaluation
+3. Run evaluation (MAIN COMMAND)
 python evaluate.py
 
-Model Comparison Results
+This will:
 
-| Metric        | Model A         | Model B        |
-| ------------- | --------------- | -------------- |
-| Fact Coverage | Moderate        | High           |
-| Structure     | High            | High           |
-| Grammar       | High            | High           |
-| Tone          | Slightly better | Slightly rigid |
-| Consistency   | Moderate        | High           |
+Run Model A + Model B
+Evaluate all test cases
+Apply custom metrics
+Generate CSV output
+Print final comparison
+
+📊 Results Summary
+| Metric        | Model A  | Model B        |
+| ------------- | -------- | -------------- |
+| Fact Coverage | Moderate | High           |
+| Structure     | High     | High           |
+| Grammar       | High     | High           |
+| Tone          | Better   | Slightly rigid |
+| Consistency   | Moderate | High           |
 
 
 🏆 Final Outcome
 
-👉 Model B performs better overall
+👉 Model B is recommended for production
+
+Reasons:
+
+Higher factual accuracy
+Strong constraint adherence
+Consistent outputs
+Better reliability in structured tasks
 
 🎯 Key Learnings
-Prompt engineering significantly impacts LLM performance
-Strong constraints improve factual accuracy
-Evaluation frameworks are critical for LLM systems
-A/B testing helps optimize prompt design
-Trade-off exists between fluency and correctness
-📌 Tech Stack
-Python
-LangChain
-Groq LLM
-Prompt Engineering
-Custom Evaluation Metrics
-CSV-based analytics
-
-🚀 Impact
-
-This project demonstrates a production-style LLM evaluation pipeline with:
-
-Automated scoring
-Model comparison (A/B testing)
-Stability analysis
-Data-driven model selection
-
-The system is extensible and can support additional models, metrics, and evaluation strategies.
+Prompt engineering directly impacts LLM performance
+Strong constraints improve factual correctness
+Evaluation frameworks are essential for LLM systems
+A/B testing enables data-driven model selection
+Trade-off exists between fluency and accuracy
